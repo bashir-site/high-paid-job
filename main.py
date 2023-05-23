@@ -24,9 +24,7 @@ def get_headhunter_vacancies(title, page, city, per_page, timeline):
     response = requests.get(url, headers=headers, params=params)
     time.sleep(1)
     response.raise_for_status()
-    data = response.content.decode()
-    response.close()
-    return json.loads(data)
+    return response.json()
 
 
 def get_superjob_vacancies(title, page, per_page, timeline):
@@ -47,9 +45,7 @@ def get_superjob_vacancies(title, page, per_page, timeline):
     response = requests.get(url, headers=headers, params=params)
     time.sleep(1)
     response.raise_for_status()
-    data = response.content.decode()
-    response.close()
-    return json.loads(data)
+    return response.json()
 
 
 def count_headhunter_vacancies(job, pages, clue):
