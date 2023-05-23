@@ -87,23 +87,25 @@ def draw_table(language_name):
     return table
 
 
-def parse_headhunter(job, clue='items'):
+def parse_headhunter(job, pages, clue='items'):
     vacancies_processed = []
-    vacancies_found = count_headhunter_vacancies(job, 4, clue)
-    headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=4, per_page=20, timeline=30)
-    for vacancies in headhunter_vacancies[clue]:
-        vacancies_salary = vacancies['salary']
-        vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
+    vacancies_found = count_headhunter_vacancies(job, pages, clue)
+    for page in range(pages):
+        headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=20, timeline=30)
+        for vacancie_number, vacancie in enumerate(headhunter_vacancies[clue]):
+            vacancies_salary = vacancie['salary']
+            vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
     return vacancies_found, vacancies_processed
 
 
-def parse_superjob(job, clue='objects'):
+def parse_superjob(job, pages, clue='objects'):
     vacancies_processed = []
-    vacancies_found = count_superjob_vacancies(job, 4, clue)
-    superjob_vacancies = get_superjob_vacancies(job, page=4, per_page=20, timeline=30)
-    for vacancies in superjob_vacancies[clue]:
-        if vacancies['town']['title'] == 'Москва':
-            vacancies_processed.append(predict_rub_salary_for_superJob(vacancies))
+    vacancies_found = count_superjob_vacancies(job, pages, clue)
+    for page in range(pages):
+        superjob_vacancies = get_superjob_vacancies(job, page=page, per_page=20, timeline=30)
+        for vacancies_number, vacancie in enumerate(superjob_vacancies[clue]):
+            if vacancie['town']['title'] == 'Москва':
+                vacancies_processed.append(predict_rub_salary_for_superJob(vacancie))
     return vacancies_found, vacancies_processed
 
 
@@ -124,8 +126,8 @@ def collect_vacancies_from_api(title):
         programmer = "Программист {}".format(language)
 
         parsers = {
-            "HeadHunter": parse_headhunter(programmer),
-            "SuperJob": parse_superjob(programmer)
+            "HeadHunter": parse_headhunter(programmer, pages=4),
+            "SuperJob": parse_superjob(programmer, pages=4)
         }
 
         vacancies_found, vacancies_processed = parsers[title]
