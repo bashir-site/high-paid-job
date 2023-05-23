@@ -27,7 +27,7 @@ def get_headhunter_vacancies(title, page, city, per_page, timeline):
     return response.json()
 
 
-def get_superjob_vacancies(title, page, per_page, timeline):
+def get_superjob_vacancies(title, page, city, per_page, timeline):
     headers = {
         "X-Api-App-Id": os.environ["SUPER_JOB_SECRET_KEY"],
         "Authorization": "Bearer r.000000010000001.example.access_token",
@@ -36,6 +36,7 @@ def get_superjob_vacancies(title, page, per_page, timeline):
 
     params = {
         'keywords': title,
+        'town': city,
         'page': page,
         'count': per_page,
         'period': timeline
@@ -59,7 +60,7 @@ def count_headhunter_vacancies(job, pages, clue):
 def count_superjob_vacancies(job, pages, clue):
     count = 0
     for page in range(pages):
-        vacancies = get_superjob_vacancies(job, page, per_page=20, timeline=30)
+        vacancies = get_superjob_vacancies(job, page, city=4, per_page=20, timeline=30)
         count += len(vacancies[clue])
     return count
 
@@ -102,10 +103,9 @@ def parse_superjob(job, pages, clue='objects'):
     vacancies_processed = []
     vacancies_found = count_superjob_vacancies(job, pages, clue)
     for page in range(pages):
-        superjob_vacancies = get_superjob_vacancies(job, page=page, per_page=20, timeline=30)
+        superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=20, timeline=30)
         for vacancies_number, vacancie in enumerate(superjob_vacancies[clue]):
-            if vacancie['town']['title'] == 'Москва':
-                vacancies_processed.append(predict_rub_salary_for_superJob(vacancie))
+            vacancies_processed.append(predict_rub_salary_for_superJob(vacancie))
     return vacancies_found, vacancies_processed
 
 
