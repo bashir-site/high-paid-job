@@ -66,10 +66,11 @@ def count_superjob_vacancies(job, pages, clue):
 
 
 def predict_rub_salary_for_headhunter(vacancie):
-    if vacancie is None or vacancie['currency'] != 'RUR':
-        return
-    if vacancie['from'] and vacancie['to']:
-        return (vacancie['from'] + vacancie['to']) / 2
+    if vacancie:
+        if vacancie['currency'] != 'RUR':
+            return
+        if vacancie['from'] and vacancie['to']:
+            return (vacancie['from'] + vacancie['to']) / 2
 
 
 def predict_rub_salary_for_superJob(job):
@@ -134,7 +135,7 @@ def collect_vacancies_from_api(title):
 
         language_names[language]["vacancies_found"] = vacancies_found
 
-        jobs = list(filter(lambda x: x is not None, vacancies_processed))
+        jobs = list(filter(lambda x: x, vacancies_processed))
         language_names[language]["vacancies_processed"] = len(jobs)
 
         average_salery = 0
