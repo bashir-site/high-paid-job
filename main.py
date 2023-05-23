@@ -6,7 +6,7 @@ from terminaltables import AsciiTable
 import os
 
 
-def get_headhunter_vacancies(title, page):
+def get_headhunter_vacancies(title, page, city, per_page, timeline):
     headers = {
         'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari/604.1 (fannyfanny879@gmail.com)',
         'Accept-Language': 'ru-RU'
@@ -14,10 +14,10 @@ def get_headhunter_vacancies(title, page):
 
     params = {
         'text': title,
-        'area': 1,
+        'area': city,
         'page': page,
-        'per_page': 20,
-        'search_period': 30
+        'per_page': per_page,
+        'search_period': timeline
     }
 
     url = "https://api.hh.ru/vacancies"
@@ -29,7 +29,7 @@ def get_headhunter_vacancies(title, page):
     return json.loads(data)
 
 
-def get_superjob_vacancies(title, page):
+def get_superjob_vacancies(title, page, per_page, timeline):
     headers = {
         "X-Api-App-Id": os.environ["SUPER_JOB_SECRET_KEY"],
         "Authorization": "Bearer r.000000010000001.example.access_token",
@@ -39,8 +39,8 @@ def get_superjob_vacancies(title, page):
     params = {
         'keywords': title,
         'page': page,
-        'count': 20,
-        'period': 30
+        'count': per_page,
+        'period': timeline
     }
 
     url = "https://api.superjob.ru/2.0/vacancies/"
@@ -55,7 +55,7 @@ def get_superjob_vacancies(title, page):
 def count_headhunter_vacancies(job, pages, clue):
     count = 0
     for page in range(pages):
-        vacancies = get_headhunter_vacancies(job, page)
+        vacancies = get_headhunter_vacancies(job, page, city=1, per_page=20, timeline=30) 
         count += len(vacancies[clue])
     return count
 
@@ -63,7 +63,7 @@ def count_headhunter_vacancies(job, pages, clue):
 def count_superjob_vacancies(job, pages, clue):
     count = 0
     for page in range(pages):
-        vacancies = get_superjob_vacancies(job, page)
+        vacancies = get_superjob_vacancies(job, page, per_page=20, timeline=30)
         count += len(vacancies[clue])
     return count
 
@@ -91,20 +91,20 @@ def draw_table(language_name):
     return table
 
 
-def parse_headhunter(programmer, clue='items'):
+def parse_headhunter(job, clue='items'):
     vacancies_processed = []
-    vacancies_found = count_headhunter_vacancies(programmer, 4, clue)
-    json_vacancies = get_headhunter_vacancies(programmer, 4)
+    vacancies_found = count_headhunter_vacancies(job, 4, clue)
+    json_vacancies = get_headhunter_vacancies(job, city=1, page=4, per_page=20, timeline=30)
     for vacancies in json_vacancies[clue]:
         vacancies_salary = vacancies['salary']
         vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
     return vacancies_found, vacancies_processed
 
 
-def parse_superjob(programmer, clue='objects'):
+def parse_superjob(job, clue='objects'):
     vacancies_processed = []
-    vacancies_found = count_superjob_vacancies(programmer, 4, clue)
-    json_vacancies = get_superjob_vacancies(programmer, 4)
+    vacancies_found = count_superjob_vacancies(job, 4, clue)
+    json_vacancies = get_superjob_vacancies(job, page=4, per_page=20, timeline=30)
     for vacancies in json_vacancies[clue]:
         if vacancies['town']['title'] == 'Москва':
             vacancies_processed.append(predict_rub_salary_for_superJob(vacancies))
@@ -127,10 +127,12 @@ def collect_vacancies_from_api(title):
     for language in language_names:
         programmer = "Программист {}".format(language)
 
-        if title == "HeadHunter":
-            vacancies_found, vacancies_processed = parse_headhunter(programmer)
-        elif title == "SuperJob":
-            vacancies_found, vacancies_processed = parse_superjob(programmer)
+        parsers = {
+            "HeadHunter": parse_headhunter(programmer),
+            "SuperJob": parse_superjob(programmer)
+        }
+
+        vacancies_found, vacancies_processed = parsers[title]
 
         language_names[language]["vacancies_found"] = vacancies_found
 
