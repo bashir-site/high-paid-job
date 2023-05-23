@@ -6,7 +6,7 @@ from terminaltables import AsciiTable
 import os
 
 
-def get_headhunter_vacancies(title, pages):
+def get_headhunter_vacancies(title, page):
     headers = {
         'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari/604.1 (fannyfanny879@gmail.com)',
         'Accept-Language': 'ru-RU'
@@ -15,7 +15,7 @@ def get_headhunter_vacancies(title, pages):
     params = {
         'text': title,
         'area': 1,
-        'page': pages,
+        'page': page,
         'per_page': 20,
         'search_period': 30
     }
@@ -29,7 +29,7 @@ def get_headhunter_vacancies(title, pages):
     return json.loads(data)
 
 
-def get_superjob_vacancies(title, pages):
+def get_superjob_vacancies(title, page):
     headers = {
         "X-Api-App-Id": os.environ["SUPER_JOB_SECRET_KEY"],
         "Authorization": "Bearer r.000000010000001.example.access_token",
@@ -38,7 +38,7 @@ def get_superjob_vacancies(title, pages):
 
     params = {
         'keywords': title,
-        'page': pages,
+        'page': page,
         'count': 20,
         'period': 30
     }
@@ -82,17 +82,17 @@ def predict_rub_salary_for_superJob(job):
 
 
 def draw_table(language_name):
-    table_data = [
+    table = [
             ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
     ]
-    for key, value in language_name.items():
-        table_data.append([key, str(value['vacancies_found']), str(value['vacancies_processed']), str(value['average_salary'])])
+    for language, description in language_name.items():
+        table.append([language, str(description['vacancies_found']), str(description['vacancies_processed']), str(description['average_salary'])])
 
-    return table_data
+    return table
 
 
-def create_dict_jobs(clue):
-    language_name = {
+def collect_vacancies_from_api(clue):
+    language_names = {
         "Python": {},
         "Java": {},
         "JavaScript": {},
@@ -104,13 +104,13 @@ def create_dict_jobs(clue):
         "Swift": {},
         "Go": {}
     }
-    for language in language_name.keys():
+    for language in language_names.keys():
         programmer = "Программист {}".format(language)
 
         if clue == 'items':
-            language_name[language]["vacancies_found"] = count_headhunter_vacancies(programmer, 4, clue)
+            language_names[language]["vacancies_found"] = count_headhunter_vacancies(programmer, 4, clue)
         elif clue == 'objects':
-            language_name[language]["vacancies_found"] = count_superjob_vacancies(programmer, 4, clue)
+            language_names[language]["vacancies_found"] = count_superjob_vacancies(programmer, 4, clue)
 
         vacancies_processed = []
 
@@ -125,26 +125,26 @@ def create_dict_jobs(clue):
                 if vacancies['town']['title'] == 'Москва':
                     vacancies_processed.append(predict_rub_salary_for_superJob(vacancies))
 
-        vacancies_proces = list(filter(lambda x: x is not None, vacancies_processed))
-        language_name[language]["vacancies_processed"] = len(vacancies_proces)
+        jobs = list(filter(lambda x: x is not None, vacancies_processed))
+        language_names[language]["vacancies_processed"] = len(jobs)
 
         average_salery = 0
-        for vacanc in vacancies_proces:
+        for vacanc in jobs:
             average_salery += int(vacanc)
-        if len(vacancies_proces) == 0:
-            language_name[language]["average_salary"] = 0
+        if len(jobs) == 0:
+            language_names[language]["average_salary"] = 0
         else:
-            language_name[language]["average_salary"] = round(average_salery / len(vacancies_proces))
-    return language_name
+            language_names[language]["average_salary"] = round(average_salery / len(jobs))
+    return language_names
 
 
-def show_table(clue, title):
-    table_data = draw_table(create_dict_jobs(clue))
-    table = AsciiTable(table_data, title)
-    return table.table
+def show_table_jobs(clue, title):
+    table = draw_table(collect_vacancies_from_api(clue))
+    table_jobs = AsciiTable(table, title)
+    return table.table_jobs
 
 
 if __name__ == "__main__":
     load_dotenv()
-    print(show_table('items', 'HeadHunter Moscow'))
-    print(show_table('objects', 'SuperJob Moscow'))
+    print(show_table_jobs('items', 'HeadHunter Moscow'))
+    print(show_table_jobs('objects', 'SuperJob Moscow'))
