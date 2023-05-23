@@ -71,11 +71,21 @@ def predict_rub_salary_for_headhunter(vacancie):
             return
         if vacancie['from'] and vacancie['to']:
             return (vacancie['from'] + vacancie['to']) / 2
+        elif vacancie['from']:
+            return vacancie['from'] * 1.2
+        else:
+            return vacancie['to'] * 0.8
+
 
 
 def predict_rub_salary_for_superJob(job):
     if job['payment_from']:
-        return round((job['payment_from'] + job['payment_to'])/2)
+        if job['payment_from'] + job['payment_to']:
+            return round((job['payment_from'] + job['payment_to'])/2)
+        elif job['payment_from']:
+            return job['payment_from'] * 1.2
+        else:
+            return job['payment_to'] * 0.8
 
 
 def draw_table(language_name):
