@@ -74,9 +74,8 @@ def predict_rub_salary_for_headhunter(vacancie):
 
 
 def predict_rub_salary_for_superJob(job):
-    if job['payment_from'] == 0:
-        return None
-    return round((job['payment_from'] + job['payment_to'])/2)
+    if job['payment_from']:
+        return round((job['payment_from'] + job['payment_to'])/2)
 
 
 def draw_table(language_name):
@@ -141,10 +140,10 @@ def collect_vacancies_from_api(title):
         average_salery = 0
         for vacanc in jobs:
             average_salery += int(vacanc)
-        if len(jobs) == 0:
-            language_names[language]["average_salary"] = 0
-        else:
+        if len(jobs):
             language_names[language]["average_salary"] = round(average_salery / len(jobs))
+        else:
+            language_names[language]["average_salary"] = 0
     return language_names
 
 
