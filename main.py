@@ -90,8 +90,8 @@ def draw_table(language_name):
 def parse_headhunter(job, clue='items'):
     vacancies_processed = []
     vacancies_found = count_headhunter_vacancies(job, 4, clue)
-    json_vacancies = get_headhunter_vacancies(job, city=1, page=4, per_page=20, timeline=30)
-    for vacancies in json_vacancies[clue]:
+    headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=4, per_page=20, timeline=30)
+    for vacancies in headhunter_vacancies[clue]:
         vacancies_salary = vacancies['salary']
         vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
     return vacancies_found, vacancies_processed
@@ -100,8 +100,8 @@ def parse_headhunter(job, clue='items'):
 def parse_superjob(job, clue='objects'):
     vacancies_processed = []
     vacancies_found = count_superjob_vacancies(job, 4, clue)
-    json_vacancies = get_superjob_vacancies(job, page=4, per_page=20, timeline=30)
-    for vacancies in json_vacancies[clue]:
+    superjob_vacancies = get_superjob_vacancies(job, page=4, per_page=20, timeline=30)
+    for vacancies in superjob_vacancies[clue]:
         if vacancies['town']['title'] == 'Москва':
             vacancies_processed.append(predict_rub_salary_for_superJob(vacancies))
     return vacancies_found, vacancies_processed
