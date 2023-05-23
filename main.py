@@ -91,7 +91,27 @@ def draw_table(language_name):
     return table
 
 
-def collect_vacancies_from_api(clue):
+def parse_headhunter(programmer, clue='items'):
+    vacancies_processed = []
+    vacancies_found = count_headhunter_vacancies(programmer, 4, clue)
+    json_vacancies = get_headhunter_vacancies(programmer, 4)
+    for vacancies in json_vacancies[clue]:
+        vacancies_salary = vacancies['salary']
+        vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
+    return vacancies_found, vacancies_processed
+
+
+def parse_superjob(programmer, clue='objects'):
+    vacancies_processed = []
+    vacancies_found = count_superjob_vacancies(programmer, 4, clue)
+    json_vacancies = get_superjob_vacancies(programmer, 4)
+    for vacancies in json_vacancies[clue]:
+        if vacancies['town']['title'] == 'Москва':
+            vacancies_processed.append(predict_rub_salary_for_superJob(vacancies))
+    return vacancies_found, vacancies_processed
+
+
+def collect_vacancies_from_api(title):
     language_names = {
         "Python": {},
         "Java": {},
@@ -104,26 +124,15 @@ def collect_vacancies_from_api(clue):
         "Swift": {},
         "Go": {}
     }
-    for language in language_names.keys():
+    for language in language_names:
         programmer = "Программист {}".format(language)
 
-        if clue == 'items':
-            language_names[language]["vacancies_found"] = count_headhunter_vacancies(programmer, 4, clue)
-        elif clue == 'objects':
-            language_names[language]["vacancies_found"] = count_superjob_vacancies(programmer, 4, clue)
+        if title == "HeadHunter":
+            vacancies_found, vacancies_processed = parse_headhunter(programmer)
+        elif title == "SuperJob":
+            vacancies_found, vacancies_processed = parse_superjob(programmer)
 
-        vacancies_processed = []
-
-        if clue == 'items':
-            json_vacancies = get_headhunter_vacancies(programmer, 4)
-            for vacancies in json_vacancies['items']:
-                vacancies_salary = vacancies['salary']
-                vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
-        elif clue == 'objects':
-            json_vacancies = get_superjob_vacancies(programmer, 4)
-            for vacancies in json_vacancies['objects']:
-                if vacancies['town']['title'] == 'Москва':
-                    vacancies_processed.append(predict_rub_salary_for_superJob(vacancies))
+        language_names[language]["vacancies_found"] = vacancies_found
 
         jobs = list(filter(lambda x: x is not None, vacancies_processed))
         language_names[language]["vacancies_processed"] = len(jobs)
@@ -138,13 +147,13 @@ def collect_vacancies_from_api(clue):
     return language_names
 
 
-def show_table_jobs(clue, title):
-    table = draw_table(collect_vacancies_from_api(clue))
-    table_jobs = AsciiTable(table, title)
-    return table.table_jobs
+def show_table_jobs(title):
+    table_jobs = draw_table(collect_vacancies_from_api(title))
+    table = AsciiTable(table_jobs, "{} Moscow".format(title))
+    return table.table
 
 
 if __name__ == "__main__":
     load_dotenv()
-    print(show_table_jobs('items', 'HeadHunter Moscow'))
-    print(show_table_jobs('objects', 'SuperJob Moscow'))
+    print(show_table_jobs('HeadHunter'))
+    print(show_table_jobs('SuperJob'))
