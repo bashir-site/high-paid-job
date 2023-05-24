@@ -72,26 +72,26 @@ def predict_rub_salary_for_superJob(vacancy):
 
 
 def parse_headhunter(job, pages, clue='items'):
-    vacancies_processed = []
+    vacancies_salarys = []
     vacancies_found = 0
     for page in range(pages):
         headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=20, timeline=30)
         vacancies_found += len(headhunter_vacancies[clue])
         for vacancy in headhunter_vacancies[clue]:
             vacancies_salary = vacancy['salary']
-            vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
-    return vacancies_found, vacancies_processed
+            vacancies_salarys.append(predict_rub_salary_for_headhunter(vacancies_salary))
+    return vacancies_found, vacancies_salarys
 
 
 def parse_superjob(job, pages, clue='objects'):
-    vacancies_processed = []
+    vacancies_salarys = []
     vacancies_found = 0
     for page in range(pages):
         superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=20, timeline=30)
         vacancies_found += len(superjob_vacancies[clue])
         for vacancies_number, vacancy in enumerate(superjob_vacancies[clue]):
-            vacancies_processed.append(predict_rub_salary_for_superJob(vacancy))
-    return vacancies_found, vacancies_processed
+            vacancies_salarys.append(predict_rub_salary_for_superJob(vacancy))
+    return vacancies_found, vacancies_salarys
 
 
 def collect_vacancies_from_api(title):
@@ -115,11 +115,11 @@ def collect_vacancies_from_api(title):
             "SuperJob": parse_superjob(programmer, pages=4)
         }
 
-        vacancies_found, vacancies_processed = parsers[title]
+        vacancies_found, vacancies_salarys = parsers[title]
 
         language_names[language]["vacancies_found"] = vacancies_found
 
-        jobs = list(filter(lambda x: x, vacancies_processed))
+        jobs = list(filter(lambda x: x, vacancies_salarys))
         language_names[language]["vacancies_processed"] = len(jobs)
 
         average_salary = 0
