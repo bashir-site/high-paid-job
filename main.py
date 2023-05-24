@@ -122,11 +122,8 @@ def collect_vacancies_from_api(title):
         jobs = list(filter(lambda x: x, vacancies_salarys))
         language_names[language]["vacancies_processed"] = len(jobs)
 
-        average_salary = 0
-        for job_salary in jobs:
-            average_salary += int(job_salary)
         if len(jobs):
-            language_names[language]["average_salary"] = round(average_salary / len(jobs))
+            language_names[language]["average_salary"] = round(sum(jobs) / len(jobs))
         else:
             language_names[language]["average_salary"] = 0
     return language_names
