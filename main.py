@@ -50,26 +50,27 @@ def get_superjob_vacancies(title, page, city, per_page, timeline):
     return response.json()
 
 
+def check_salary(job, salary_from, salary_to):
+    if job[salary_from] and job[salary_to]:
+        return (job[salary_from] + job[salary_to]) / 2
+    elif job[salary_from]:
+        return job[salary_from] * 1.2
+    else:
+        return job[salary_to] * 0.8
+
+
 def predict_rub_salary_for_headhunter(vacancy):
     if vacancy:
         if vacancy['currency'] != 'RUR':
             return
-        if vacancy['from'] and vacancy['to']:
-            return (vacancy['from'] + vacancy['to']) / 2
-        elif vacancy['from']:
-            return vacancy['from'] * 1.2
-        else:
-            return vacancy['to'] * 0.8
+        salary = check_salary(vacancy, 'from', 'to')
+        return salary
 
 
-def predict_rub_salary_for_superJob(job):
-    if job['payment_from']:
-        if job['payment_from'] + job['payment_to']:
-            return round((job['payment_from'] + job['payment_to'])/2)
-        elif job['payment_from']:
-            return job['payment_from'] * 1.2
-        else:
-            return job['payment_to'] * 0.8
+def predict_rub_salary_for_superJob(vacancy):
+    if vacancy['payment_from']:
+        salary = check_salary(vacancy, 'payment_from', 'payment_to')
+        return salary
 
 
 def parse_headhunter(job, pages, clue='items'):
