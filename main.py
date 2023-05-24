@@ -1,5 +1,4 @@
 import requests
-import json
 import time
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
@@ -24,7 +23,6 @@ def get_headhunter_vacancies(title, page, city, per_page, timeline):
     response = requests.get(url, headers=headers, params=params)
     time.sleep(1)
     response.raise_for_status()
-    print(len(response.json()['items']))
     return response.json()
 
 
@@ -75,7 +73,7 @@ def parse_headhunter(job, pages, clue='items'):
     vacancies_salarys = []
     vacancies_found = 0
     for page in range(pages):
-        headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=20, timeline=30)
+        headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
         vacancies_found += len(headhunter_vacancies[clue])
         for vacancy in headhunter_vacancies[clue]:
             vacancies_salary = vacancy['salary']
@@ -87,7 +85,7 @@ def parse_superjob(job, pages, clue='objects'):
     vacancies_salarys = []
     vacancies_found = 0
     for page in range(pages):
-        superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=20, timeline=30)
+        superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=100, timeline=30)
         vacancies_found += len(superjob_vacancies[clue])
         for vacancies_number, vacancy in enumerate(superjob_vacancies[clue]):
             vacancies_salarys.append(predict_rub_salary_for_superJob(vacancy))
@@ -111,8 +109,8 @@ def collect_vacancies_from_api(title):
         programmer = "Программист {}".format(language)
 
         parsers = {
-            "HeadHunter": parse_headhunter(programmer, pages=4),
-            "SuperJob": parse_superjob(programmer, pages=4)
+            "HeadHunter": parse_headhunter(programmer, pages=1000),
+            "SuperJob": parse_superjob(programmer, pages=1000)
         }
 
         vacancies_found, vacancies_salarys = parsers[title]
@@ -138,7 +136,7 @@ def draw_table(title):
 
     for language, description in language_name.items():
         table_jobs.append([language, str(description['vacancies_found']), str(description['vacancies_processed']), str(description['average_salary'])])
-    
+
     table = AsciiTable(table_jobs, "{} Moscow".format(title))
     return table.table
 
