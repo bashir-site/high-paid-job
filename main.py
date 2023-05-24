@@ -60,15 +60,13 @@ def check_salary(job, salary_from, salary_to):
 
 
 def predict_rub_salary_for_headhunter(vacancy):
-    if vacancy:
-        if vacancy['currency'] != 'RUR':
-            return
+    if vacancy and vacancy['currency'] == 'RUR':
         salary = check_salary(vacancy, 'from', 'to')
         return salary
 
 
 def predict_rub_salary_for_superJob(vacancy):
-    if vacancy['payment_from']:
+    if vacancy:
         salary = check_salary(vacancy, 'payment_from', 'payment_to')
         return salary
 
