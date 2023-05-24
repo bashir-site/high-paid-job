@@ -78,7 +78,7 @@ def parse_headhunter(job, pages, clue='items'):
     for page in range(pages):
         headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=20, timeline=30)
         vacancies_found += len(headhunter_vacancies[clue])
-        for vacancie_number, vacancie in enumerate(headhunter_vacancies[clue]):
+        for vacancie in headhunter_vacancies[clue]:
             vacancies_salary = vacancie['salary']
             vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
     return vacancies_found, vacancies_processed
