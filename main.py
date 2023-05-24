@@ -77,7 +77,6 @@ def predict_rub_salary_for_headhunter(vacancie):
             return vacancie['to'] * 0.8
 
 
-
 def predict_rub_salary_for_superJob(job):
     if job['payment_from']:
         if job['payment_from'] + job['payment_to']:
@@ -86,16 +85,6 @@ def predict_rub_salary_for_superJob(job):
             return job['payment_from'] * 1.2
         else:
             return job['payment_to'] * 0.8
-
-
-def draw_table(language_name):
-    table = [
-            ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
-    ]
-    for language, description in language_name.items():
-        table.append([language, str(description['vacancies_found']), str(description['vacancies_processed']), str(description['average_salary'])])
-
-    return table
 
 
 def parse_headhunter(job, pages, clue='items'):
@@ -157,13 +146,21 @@ def collect_vacancies_from_api(title):
     return language_names
 
 
-def show_table_jobs(title):
-    table_jobs = draw_table(collect_vacancies_from_api(title))
+def draw_table(title):
+    language_name = collect_vacancies_from_api(title)
+
+    table_jobs = [
+            ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
+    ]
+
+    for language, description in language_name.items():
+        table_jobs.append([language, str(description['vacancies_found']), str(description['vacancies_processed']), str(description['average_salary'])])
+    
     table = AsciiTable(table_jobs, "{} Moscow".format(title))
     return table.table
 
 
 if __name__ == "__main__":
     load_dotenv()
-    print(show_table_jobs('HeadHunter'))
-    print(show_table_jobs('SuperJob'))
+    print(draw_table('HeadHunter'))
+    print(draw_table('SuperJob'))
