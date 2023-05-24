@@ -24,6 +24,7 @@ def get_headhunter_vacancies(title, page, city, per_page, timeline):
     response = requests.get(url, headers=headers, params=params)
     time.sleep(1)
     response.raise_for_status()
+    print(len(response.json()['items']))
     return response.json()
 
 
@@ -47,22 +48,6 @@ def get_superjob_vacancies(title, page, city, per_page, timeline):
     time.sleep(1)
     response.raise_for_status()
     return response.json()
-
-
-def count_headhunter_vacancies(job, pages, clue):
-    count = 0
-    for page in range(pages):
-        vacancies = get_headhunter_vacancies(job, page, city=1, per_page=20, timeline=30) 
-        count += len(vacancies[clue])
-    return count
-
-
-def count_superjob_vacancies(job, pages, clue):
-    count = 0
-    for page in range(pages):
-        vacancies = get_superjob_vacancies(job, page, city=4, per_page=20, timeline=30)
-        count += len(vacancies[clue])
-    return count
 
 
 def predict_rub_salary_for_headhunter(vacancie):
@@ -89,9 +74,10 @@ def predict_rub_salary_for_superJob(job):
 
 def parse_headhunter(job, pages, clue='items'):
     vacancies_processed = []
-    vacancies_found = count_headhunter_vacancies(job, pages, clue)
+    vacancies_found = 0
     for page in range(pages):
         headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=20, timeline=30)
+        vacancies_found += len(headhunter_vacancies[clue])
         for vacancie_number, vacancie in enumerate(headhunter_vacancies[clue]):
             vacancies_salary = vacancie['salary']
             vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
@@ -100,9 +86,10 @@ def parse_headhunter(job, pages, clue='items'):
 
 def parse_superjob(job, pages, clue='objects'):
     vacancies_processed = []
-    vacancies_found = count_superjob_vacancies(job, pages, clue)
+    vacancies_found = 0
     for page in range(pages):
         superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=20, timeline=30)
+        vacancies_found += len(superjob_vacancies[clue])
         for vacancies_number, vacancie in enumerate(superjob_vacancies[clue]):
             vacancies_processed.append(predict_rub_salary_for_superJob(vacancie))
     return vacancies_found, vacancies_processed
