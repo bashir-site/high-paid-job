@@ -50,16 +50,16 @@ def get_superjob_vacancies(title, page, city, per_page, timeline):
     return response.json()
 
 
-def predict_rub_salary_for_headhunter(vacancie):
-    if vacancie:
-        if vacancie['currency'] != 'RUR':
+def predict_rub_salary_for_headhunter(vacancy):
+    if vacancy:
+        if vacancy['currency'] != 'RUR':
             return
-        if vacancie['from'] and vacancie['to']:
-            return (vacancie['from'] + vacancie['to']) / 2
-        elif vacancie['from']:
-            return vacancie['from'] * 1.2
+        if vacancy['from'] and vacancy['to']:
+            return (vacancy['from'] + vacancy['to']) / 2
+        elif vacancy['from']:
+            return vacancy['from'] * 1.2
         else:
-            return vacancie['to'] * 0.8
+            return vacancy['to'] * 0.8
 
 
 def predict_rub_salary_for_superJob(job):
@@ -78,8 +78,8 @@ def parse_headhunter(job, pages, clue='items'):
     for page in range(pages):
         headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=20, timeline=30)
         vacancies_found += len(headhunter_vacancies[clue])
-        for vacancie in headhunter_vacancies[clue]:
-            vacancies_salary = vacancie['salary']
+        for vacancy in headhunter_vacancies[clue]:
+            vacancies_salary = vacancy['salary']
             vacancies_processed.append(predict_rub_salary_for_headhunter(vacancies_salary))
     return vacancies_found, vacancies_processed
 
@@ -90,8 +90,8 @@ def parse_superjob(job, pages, clue='objects'):
     for page in range(pages):
         superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=20, timeline=30)
         vacancies_found += len(superjob_vacancies[clue])
-        for vacancies_number, vacancie in enumerate(superjob_vacancies[clue]):
-            vacancies_processed.append(predict_rub_salary_for_superJob(vacancie))
+        for vacancies_number, vacancy in enumerate(superjob_vacancies[clue]):
+            vacancies_processed.append(predict_rub_salary_for_superJob(vacancy))
     return vacancies_found, vacancies_processed
 
 
