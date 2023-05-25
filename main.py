@@ -48,7 +48,7 @@ def get_superjob_vacancies(title, page, city, per_page, timeline):
     return response.json()
 
 
-def check_salary(job, salary_from, salary_to):
+def count_salary(job, salary_from, salary_to):
     if job[salary_from] and job[salary_to]:
         return (job[salary_from] + job[salary_to]) / 2
     elif job[salary_from]:
@@ -59,13 +59,13 @@ def check_salary(job, salary_from, salary_to):
 
 def predict_rub_salary_for_headhunter(vacancy):
     if vacancy and vacancy['currency'] == 'RUR':
-        salary = check_salary(vacancy, 'from', 'to')
+        salary = count_salary(vacancy, 'from', 'to')
         return salary
 
 
 def predict_rub_salary_for_superJob(vacancy):
     if vacancy:
-        salary = check_salary(vacancy, 'payment_from', 'payment_to')
+        salary = count_salary(vacancy, 'payment_from', 'payment_to')
         return salary
 
 
