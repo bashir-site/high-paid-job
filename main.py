@@ -26,9 +26,9 @@ def get_headhunter_vacancies(title, page, city, per_page, timeline):
     return response.json()
 
 
-def get_superjob_vacancies(title, page, city, per_page, timeline):
+def get_superjob_vacancies(title, secret_key, page, city, per_page, timeline):
     headers = {
-        "X-Api-App-Id": os.environ["SUPER_JOB_SECRET_KEY"],
+        "X-Api-App-Id": secret_key,
         "Authorization": "Bearer r.000000010000001.example.access_token",
         "Content-Type": "application/x-www-form-urlencoded"
     }
@@ -69,7 +69,7 @@ def predict_rub_salary_for_superJob(vacancy):
         return salary
 
 
-def parse_headhunter(job, pages, clue='items'):
+def parse_headhunter(job, secret_key, pages, clue='items'):
     vacancies_salary = []
     vacancies_found = 0
     for page in range(pages):
@@ -81,18 +81,18 @@ def parse_headhunter(job, pages, clue='items'):
     return vacancies_found, vacancies_salary
 
 
-def parse_superjob(job, pages, clue='objects'):
+def parse_superjob(job, secret_key, pages, clue='objects'):
     vacancies_salary = []
     vacancies_found = 0
     for page in range(pages):
-        superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=100, timeline=30)
+        superjob_vacancies = get_superjob_vacancies(job, secret_key, page=page, city=4, per_page=100, timeline=30)
         vacancies_found += len(superjob_vacancies[clue])
         for vacancy in superjob_vacancies[clue]:
             vacancies_salary.append(predict_rub_salary_for_superJob(vacancy))
     return vacancies_found, vacancies_salary
 
 
-def collect_vacancies_from_api(title):
+def collect_vacancies_from_api(title, secret_key):
     language_names = {
         "Python": {},
         "Java": {},
@@ -114,7 +114,7 @@ def collect_vacancies_from_api(title):
         }
 
         parser = parsers[title]
-        vacancies_found, vacancies_salary = parser(programmer, pages=1000)
+        vacancies_found, vacancies_salary = parser(programmer, secret_key, pages=1000)
 
         language_names[language]["vacancies_found"] = vacancies_found
 
@@ -128,8 +128,8 @@ def collect_vacancies_from_api(title):
     return language_names
 
 
-def draw_table(title):
-    language_name = collect_vacancies_from_api(title)
+def draw_table(title, secret_key=''):
+    language_name = collect_vacancies_from_api(title, secret_key)
 
     table_jobs = [
             ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
@@ -144,5 +144,6 @@ def draw_table(title):
 
 if __name__ == "__main__":
     load_dotenv()
+    super_job_secret_key = os.environ["SUPER_JOB_SECRET_KEY"]
     print(draw_table('HeadHunter'))
-    print(draw_table('SuperJob'))
+    print(draw_table('SuperJob', super_job_secret_key))
