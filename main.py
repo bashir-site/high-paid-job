@@ -87,7 +87,7 @@ def parse_superjob(job, pages, clue='objects'):
     for page in range(pages):
         superjob_vacancies = get_superjob_vacancies(job, page=page, city=4, per_page=100, timeline=30)
         vacancies_found += len(superjob_vacancies[clue])
-        for vacancies_number, vacancy in enumerate(superjob_vacancies[clue]):
+        for vacancy in superjob_vacancies[clue]:
             vacancies_salary.append(predict_rub_salary_for_superJob(vacancy))
     return vacancies_found, vacancies_salary
 
