@@ -76,8 +76,8 @@ def parse_headhunter(job, pages, clue='items'):
         headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
         vacancies_found += len(headhunter_vacancies[clue])
         for vacancy in headhunter_vacancies[clue]:
-            vacancies_salary = vacancy['salary']
-            vacancies_salary.append(predict_rub_salary_for_headhunter(vacancies_salary))
+            vacancie_salary = vacancy['salary']
+            vacancies_salary.append(predict_rub_salary_for_headhunter(vacancie_salary))
     return vacancies_found, vacancies_salary
 
 
@@ -109,11 +109,12 @@ def collect_vacancies_from_api(title):
         programmer = "Программист {}".format(language)
 
         parsers = {
-            "HeadHunter": parse_headhunter(programmer, pages=1000),
-            "SuperJob": parse_superjob(programmer, pages=1000)
+            "HeadHunter": parse_headhunter,
+            "SuperJob": parse_superjob
         }
 
-        vacancies_found, vacancies_salary = parsers[title]
+        parser = parsers[title]
+        vacancies_found, vacancies_salary = parser(programmer, pages=1000)
 
         language_names[language]["vacancies_found"] = vacancies_found
 
