@@ -92,7 +92,7 @@ def parse_superjob(job, secret_key, pages, clue='objects'):
     return vacancies_found, vacancies_salary
 
 
-def collect_vacancies_from_api(title, secret_key=''):
+def get_statistics_from_api(title, secret_key=''):
     job_statistics = {
         # "Python": {},
         # "Java": {},
@@ -143,7 +143,7 @@ def draw_table(job_statistics):
 if __name__ == "__main__":
     load_dotenv()
     super_job_secret_key = os.environ["SUPER_JOB_SECRET_KEY"]
-    headhunter_job_statistics = collect_vacancies_from_api('HeadHunter')
-    superjob_job_statistics = collect_vacancies_from_api('SuperJob', super_job_secret_key)
+    headhunter_job_statistics = get_statistics_from_api('HeadHunter')
+    superjob_job_statistics = get_statistics_from_api('SuperJob', super_job_secret_key)
     print(draw_table(headhunter_job_statistics))
     print(draw_table(superjob_job_statistics))
