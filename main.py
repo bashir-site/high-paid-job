@@ -70,26 +70,26 @@ def predict_rub_salary_for_superJob(vacancy):
 
 
 def parse_headhunter(job, pages, clue='items'):
-    vacancies_salary = []
+    vacancies_salaries = []
     vacancies_found = 0
     for page in range(pages):
         headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
         vacancies_found += len(headhunter_vacancies[clue])
         for vacancy in headhunter_vacancies[clue]:
             vacancie_salary = vacancy['salary']
-            vacancies_salary.append(predict_rub_salary_for_headhunter(vacancie_salary))
-    return vacancies_found, vacancies_salary
+            vacancies_salaries.append(predict_rub_salary_for_headhunter(vacancie_salary))
+    return vacancies_found, vacancies_salaries
 
 
 def parse_superjob(job, secret_key, pages, clue='objects'):
-    vacancies_salary = []
+    vacancies_salaries = []
     vacancies_found = 0
     for page in range(pages):
         superjob_vacancies = get_superjob_vacancies(job, secret_key, page=page, city=4, per_page=100, timeline=30)
         vacancies_found += len(superjob_vacancies[clue])
         for vacancy in superjob_vacancies[clue]:
-            vacancies_salary.append(predict_rub_salary_for_superJob(vacancy))
-    return vacancies_found, vacancies_salary
+            vacancies_salaries.append(predict_rub_salary_for_superJob(vacancy))
+    return vacancies_found, vacancies_salaries
 
 
 def get_statistics_from_api(title, secret_key=''):
@@ -115,11 +115,11 @@ def get_statistics_from_api(title, secret_key=''):
         }
 
         parser = parsers[title]
-        vacancies_found, vacancies_salary = parser(programmer, 2)
+        vacancies_found, vacancies_salaries = parser(programmer, 2)
 
         job_statistics[language]["vacancies_found"] = vacancies_found
 
-        all_salaries = list(filter(lambda x: x, vacancies_salary))
+        all_salaries = list(filter(lambda x: x, vacancies_salaries))
         job_statistics[language]["vacancies_processed"] = len(all_salaries)
 
         if len(all_salaries):
