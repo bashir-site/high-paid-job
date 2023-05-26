@@ -92,20 +92,20 @@ def parse_superjob(job, secret_key, pages, clue='objects'):
     return vacancies_found, vacancies_salary
 
 
-def collect_vacancies_from_api(title, secret_key):
-    language_names = {
-        "Python": {},
-        "Java": {},
-        "JavaScript": {},
-        "С++": {},
-        "C#": {},
-        "Ruby": {},
-        "PHP": {},
-        "C": {},
+def collect_vacancies_from_api(title, secret_key=''):
+    job_statistics = {
+        # "Python": {},
+        # "Java": {},
+        # "JavaScript": {},
+        # "С++": {},
+        # "C#": {},
+        # "Ruby": {},
+        # "PHP": {},
+        # "C": {},
         "Swift": {},
         "Go": {}
     }
-    for language in language_names:
+    for language in job_statistics:
         programmer = "Программист {}".format(language)
 
         parsers = {
@@ -114,36 +114,36 @@ def collect_vacancies_from_api(title, secret_key):
         }
 
         parser = parsers[title]
-        vacancies_found, vacancies_salary = parser(programmer, secret_key, pages=1000)
+        vacancies_found, vacancies_salary = parser(programmer, secret_key, pages=2)
 
-        language_names[language]["vacancies_found"] = vacancies_found
+        job_statistics[language]["vacancies_found"] = vacancies_found
 
         all_salaries = list(filter(lambda x: x, vacancies_salary))
-        language_names[language]["vacancies_processed"] = len(all_salaries)
+        job_statistics[language]["vacancies_processed"] = len(all_salaries)
 
         if len(all_salaries):
-            language_names[language]["average_salary"] = round(sum(all_salaries) / len(all_salaries))
+            job_statistics[language]["average_salary"] = round(sum(all_salaries) / len(all_salaries))
         else:
-            language_names[language]["average_salary"] = 0
-    return language_names
+            job_statistics[language]["average_salary"] = 0
+    return job_statistics
 
 
-def draw_table(title, secret_key=''):
-    language_name = collect_vacancies_from_api(title, secret_key)
-
+def draw_table(job_statistics):
     table_jobs = [
             ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
     ]
 
-    for language, description in language_name.items():
+    for language, description in job_statistics.items():
         table_jobs.append([language, str(description['vacancies_found']), str(description['vacancies_processed']), str(description['average_salary'])])
 
-    table = AsciiTable(table_jobs, "{} Moscow".format(title))
+    table = AsciiTable(table_jobs, "{} Moscow".format(job_statistics))
     return table.table
 
 
 if __name__ == "__main__":
     load_dotenv()
     super_job_secret_key = os.environ["SUPER_JOB_SECRET_KEY"]
-    print(draw_table('HeadHunter'))
-    print(draw_table('SuperJob', super_job_secret_key))
+    headhunter_job_statistics = collect_vacancies_from_api('HeadHunter')
+    superjob_job_statistics = collect_vacancies_from_api('SuperJob', super_job_secret_key)
+    print(draw_table(headhunter_job_statistics))
+    print(draw_table(superjob_job_statistics))
