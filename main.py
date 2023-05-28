@@ -105,16 +105,18 @@ def get_statistics_from_api(title, secret_key=''):
         "Swift": {},
         "Go": {}
     }
-    for language in job_statistics:
-        programmer = "Программист {}".format(language)
 
-        parsers = {
+    parsers = {
             "HeadHunter": lambda x, y: parse_headhunter(x, y),
             "SuperJob":  lambda x, y: parse_superjob(x, secret_key, y)
 
         }
 
-        parser = parsers[title]
+    parser = parsers[title]
+    
+    for language in job_statistics:
+        programmer = "Программист {}".format(language)
+
         vacancies_found, vacancies_salaries = parser(programmer, 2)
 
         job_statistics[language]["vacancies_found"] = vacancies_found
