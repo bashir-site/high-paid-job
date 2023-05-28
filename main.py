@@ -73,10 +73,10 @@ def parse_headhunter(job, pages):
     vacancies_salaries = []
     vacancies_found = 0
     for page in range(pages):
-        headhunter_vacancies = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
-        vacancies_found += len(headhunter_vacancies['items'])
-        for vacancy in headhunter_vacancies['items']:
-            vacancie_salary = vacancy['salary']
+        headhunter_vacancie = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
+        vacancies_found += len(headhunter_vacancie['items'])
+        for vacancies in headhunter_vacancie['items']:
+            vacancie_salary = vacancies['salary']
             vacancies_salaries.append(predict_rub_salary_for_headhunter(vacancie_salary))
     return vacancies_found, vacancies_salaries
 
@@ -85,10 +85,10 @@ def parse_superjob(job, secret_key, pages):
     vacancies_salaries = []
     vacancies_found = 0
     for page in range(pages):
-        superjob_vacancies = get_superjob_vacancies(job, secret_key, page=page, city=4, per_page=100, timeline=30)
-        vacancies_found += len(superjob_vacancies['objects'])
-        for vacancy in superjob_vacancies['objects']:
-            vacancies_salaries.append(predict_rub_salary_for_superJob(vacancy))
+        superjob_vacancie = get_superjob_vacancies(job, secret_key, page=page, city=4, per_page=100, timeline=30)
+        vacancies_found += len(superjob_vacancie['objects'])
+        for vacancies in superjob_vacancie['objects']:
+            vacancies_salaries.append(predict_rub_salary_for_superJob(vacancies))
     return vacancies_found, vacancies_salaries
 
 
@@ -101,14 +101,14 @@ def get_statistics_from_api(title, secret_key=''):
     parser = parsers[title]
 
     languages = [
-        # "Python", 
-        # "Java", 
-        # "JavaScript", 
-        # "С++", 
-        # "C#", 
-        # "Ruby", 
-        # "PHP", 
-        # "C", 
+        "Python", 
+        "Java", 
+        "JavaScript", 
+        "С++", 
+        "C#", 
+        "Ruby", 
+        "PHP", 
+        "C", 
         "Swift", 
         "Go"
     ]
@@ -117,7 +117,7 @@ def get_statistics_from_api(title, secret_key=''):
     for language in languages:
         programmer = "Программист {}".format(language)
 
-        vacancies_found, vacancies_salaries = parser(programmer, 2)
+        vacancies_found, vacancies_salaries = parser(programmer, 1000)
 
         all_salaries = list(filter(lambda x: x, vacancies_salaries))
 
