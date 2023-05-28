@@ -93,41 +93,40 @@ def parse_superjob(job, secret_key, pages, clue='objects'):
 
 
 def get_statistics_from_api(title, secret_key=''):
-    job_statistics = {
-        # "Python": {},
-        # "Java": {},
-        # "JavaScript": {},
-        # "С++": {},
-        # "C#": {},
-        # "Ruby": {},
-        # "PHP": {},
-        # "C": {},
-        "Swift": {},
-        "Go": {}
+    parsers = {
+        "HeadHunter": lambda x, y: parse_headhunter(x, y),
+        "SuperJob":  lambda x, y: parse_superjob(x, secret_key, y)
     }
 
-    parsers = {
-            "HeadHunter": lambda x, y: parse_headhunter(x, y),
-            "SuperJob":  lambda x, y: parse_superjob(x, secret_key, y)
-
-        }
-
     parser = parsers[title]
+
+    languages = [
+        # "Python", 
+        # "Java", 
+        # "JavaScript", 
+        # "С++", 
+        # "C#", 
+        # "Ruby", 
+        # "PHP", 
+        # "C", 
+        "Swift", 
+        "Go"
+    ]
     
-    for language in job_statistics:
+    job_statistics = {}
+    for language in languages:
         programmer = "Программист {}".format(language)
 
         vacancies_found, vacancies_salaries = parser(programmer, 2)
 
-        job_statistics[language]["vacancies_found"] = vacancies_found
-
         all_salaries = list(filter(lambda x: x, vacancies_salaries))
-        job_statistics[language]["vacancies_processed"] = len(all_salaries)
 
-        if len(all_salaries):
-            job_statistics[language]["average_salary"] = round(sum(all_salaries) / len(all_salaries))
-        else:
-            job_statistics[language]["average_salary"] = 0
+        job_statistics[language] = {
+            "vacancies_found": vacancies_found,
+            "vacancies_processed": len(all_salaries),
+            "average_salary": round(sum(all_salaries) / len(all_salaries)) if len(all_salaries) else 0
+        }
+
     return job_statistics
 
 
