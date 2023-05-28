@@ -73,11 +73,11 @@ def parse_headhunter(job, pages):
     vacancies_salaries = []
     vacancies_found = 0
     for page in range(pages):
-        headhunter_vacancie = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
-        vacancies_found += len(headhunter_vacancie['items'])
-        for vacancies in headhunter_vacancie['items']:
-            vacancie_salary = vacancies['salary']
-            vacancies_salaries.append(predict_rub_salary_for_headhunter(vacancie_salary))
+        headhunter_vacancy = get_headhunter_vacancies(job, city=1, page=page, per_page=100, timeline=30)
+        vacancies_found += len(headhunter_vacancy['items'])
+        for vacancy in headhunter_vacancie['items']:
+            vacancy_salary = vacancy['salary']
+            vacancies_salaries.append(predict_rub_salary_for_headhunter(vacancy_salary))
     return vacancies_found, vacancies_salaries
 
 
@@ -85,10 +85,10 @@ def parse_superjob(job, secret_key, pages):
     vacancies_salaries = []
     vacancies_found = 0
     for page in range(pages):
-        superjob_vacancie = get_superjob_vacancies(job, secret_key, page=page, city=4, per_page=100, timeline=30)
-        vacancies_found += len(superjob_vacancie['objects'])
-        for vacancies in superjob_vacancie['objects']:
-            vacancies_salaries.append(predict_rub_salary_for_superJob(vacancies))
+        superjob_vacancy = get_superjob_vacancies(job, secret_key, page=page, city=4, per_page=100, timeline=30)
+        vacancies_found += len(superjob_vacancy['objects'])
+        for vacancy in superjob_vacancy['objects']:
+            vacancies_salaries.append(predict_rub_salary_for_superJob(vacancy))
     return vacancies_found, vacancies_salaries
 
 
